@@ -6,7 +6,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { mockOrders } from '@/lib/mockData';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
-import { Order } from '@/types/order';
+import { getStatusBadgeClass, getStatusLabel, formatDate, formatCurrency } from '@/lib/utils';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -16,23 +16,6 @@ export default function DashboardPage() {
 
   const recentOrders = mockOrders.slice(0, 3);
   const ordersWithTracking = recentOrders.filter(order => order.trackingNumber);
-
-  // Status badge styling
-  const statusClasses: Record<Order['status'], string> = {
-    'ordered': 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-    'processing': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-    'shipped': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-    'out-for-delivery': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-    'delivered': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  };
-
-  const statusLabel: Record<Order['status'], string> = {
-    'ordered': 'Ordered',
-    'processing': 'Processing',
-    'shipped': 'Shipped',
-    'out-for-delivery': 'Out for Delivery',
-    'delivered': 'Delivered',
-  };
 
   return (
     <>
@@ -76,7 +59,7 @@ export default function DashboardPage() {
             variant="outline"
             onClick={() => {
               // optional: expose a BetterBot open function via context
-              const event = new CustomEvent('open-betterbot');
+              const event = new CustomEvent('openBetterBot');
               window.dispatchEvent(event);
             }}
           >
@@ -117,15 +100,15 @@ export default function DashboardPage() {
                       {order.poNumber}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(order.date).toLocaleDateString()}
+                      {formatDate(order.date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClasses[order.status]}`}>
-                        {statusLabel[order.status]}
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(order.status)}`}>
+                        {getStatusLabel(order.status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                      ${order.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {formatCurrency(order.total)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Link

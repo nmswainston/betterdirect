@@ -1,6 +1,7 @@
 'use client';
 
 import { OrderItem as OrderItemType } from '@/types/order';
+import { formatCurrency } from '@/lib/utils';
 
 interface OrderItemProps {
   item: OrderItemType;
@@ -47,7 +48,7 @@ export default function OrderItem({
             <h4 className="font-semibold text-gray-900 dark:text-gray-100">{item.productName}</h4>
             <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">SKU: {item.sku}</p>
             <p className="text-lg font-medium text-gray-900 mt-2 dark:text-gray-100">
-              ${item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {formatCurrency(item.price)}
             </p>
           </div>
         </div>
@@ -73,7 +74,7 @@ export default function OrderItem({
           <div className="text-right">
             <p className="text-sm text-gray-500 dark:text-gray-400">Subtotal</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              ${(item.price * quantity).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {formatCurrency(item.price * quantity)}
             </p>
           </div>
         </div>

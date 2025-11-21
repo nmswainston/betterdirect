@@ -6,8 +6,10 @@ import Link from 'next/link';
 import Timeline from '@/components/Timeline';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import OrderInfoCard from '@/components/OrderInfoCard';
 import { getOrderById, getTrackingByOrderId } from '@/lib/mockData';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
+import { formatDate, formatDateTime, formatCurrency } from '@/lib/utils';
 
 export default function TrackingPage() {
   const router = useRouter();
@@ -21,17 +23,15 @@ export default function TrackingPage() {
   useEffect(() => {
     if (!isReady) return;
 
-    if (!order) {
+    const foundOrder = getOrderById(orderId);
+    if (!foundOrder) {
       router.push('/dashboard');
       return;
     }
 
-    if (!tracking && order.trackingNumber) {
-      // If tracking info doesn't exist but order has tracking number,
-      // we could create a basic tracking info
-      // For now, just show a message
-    }
-  }, [orderId, router, order, tracking, isReady]);
+    setOrder(foundOrder);
+    setTracking(getTrackingByOrderId(orderId));
+  }, [orderId, router, isReady]);
 
   if (!isReady || !order) {
     return null;
@@ -53,34 +53,7 @@ export default function TrackingPage() {
         </div>
 
         {/* Order Info Section */}
-        <Card>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">PO Number</p>
-              <p className="text-base font-semibold text-gray-900 dark:text-gray-100">{order.poNumber}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Order Date</p>
-              <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                {new Date(order.date).toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Shipping Address</p>
-              <p className="text-base font-semibold text-gray-900 dark:text-gray-100">{order.shippingAddress}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Tracking Number</p>
-              <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                {order.trackingNumber || 'Not available'}
-              </p>
-            </div>
-          </div>
-        </Card>
+        <OrderInfoCard order={order} />
 
         {/* No Tracking State */}
         <Card>
@@ -112,32 +85,7 @@ export default function TrackingPage() {
       </div>
 
       {/* Order Info Section */}
-      <Card>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">PO Number</p>
-            <p className="text-base font-semibold text-gray-900 dark:text-gray-100">{order.poNumber}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Order Date</p>
-            <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
-              {new Date(order.date).toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-              })}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Shipping Address</p>
-            <p className="text-base font-semibold text-gray-900 dark:text-gray-100">{order.shippingAddress}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Tracking Number</p>
-            <p className="text-base font-semibold text-gray-900 dark:text-gray-100">{tracking.trackingNumber}</p>
-          </div>
-        </div>
-      </Card>
+      <OrderInfoCard order={order} trackingNumber={tracking.trackingNumber} />
 
       {/* Timeline and Details Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -161,11 +109,7 @@ export default function TrackingPage() {
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Estimated Delivery</p>
                 <p className="text-base font-medium text-gray-900 dark:text-gray-100">
-                  {new Date(tracking.estimatedDelivery).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
+                  {formatDate(tracking.estimatedDelivery, 'long')}
                 </p>
               </div>
             </div>
@@ -181,7 +125,7 @@ export default function TrackingPage() {
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-300">Total</span>
                 <span className="font-medium text-gray-900 dark:text-gray-100">
-                  ${order.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {formatCurrency(order.total)}
                 </span>
               </div>
             </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { TrackingStatus, TrackingEvent } from '@/types/tracking';
+import { formatDateTime } from '@/lib/utils';
 
 interface TimelineProps {
   events: TrackingEvent[];
@@ -85,13 +86,7 @@ export default function Timeline({ events, currentStatus }: TimelineProps) {
                       </p>
                     )}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(event.timestamp).toLocaleString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })}
+                      {formatDateTime(event.timestamp)}
                     </p>
                   </>
                 )}

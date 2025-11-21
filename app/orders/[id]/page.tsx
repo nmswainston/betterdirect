@@ -8,6 +8,7 @@ import OrderItem from '@/components/OrderItem';
 import { getOrderById } from '@/lib/mockData';
 import { OrderItem as OrderItemType } from '@/types/order';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
+import { getStatusBadgeClass, formatDate, formatCurrency } from '@/lib/utils';
 
 interface SelectedItem {
   item: OrderItemType;
@@ -27,22 +28,25 @@ export default function OrderDetailPage() {
   useEffect(() => {
     if (!isReady) return;
 
-    if (!order) {
+    const foundOrder = getOrderById(orderId);
+    if (!foundOrder) {
       // Order not found, redirect to orders list
       router.push('/orders');
       return;
     }
 
+    setOrder(foundOrder);
+
     // Initialize selected items with original quantities
     const initial: Record<string, SelectedItem> = {};
-    order.items.forEach((item) => {
+    foundOrder.items.forEach((item) => {
       initial[item.id] = {
         item,
         quantity: item.quantity,
       };
     });
     setSelectedItems(initial);
-  }, [orderId, router, order, isReady]);
+  }, [orderId, router, isReady]);
 
   if (!isReady || !order) {
     return null;
@@ -129,14 +133,9 @@ export default function OrderDetailPage() {
             <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0 text-sm text-gray-600 dark:text-gray-300">
               <span>PO Number: <span className="font-semibold text-gray-900 dark:text-gray-100">{order.poNumber}</span></span>
               <span className="hidden sm:inline">•</span>
-              <span>Date: <span className="font-semibold text-gray-900 dark:text-gray-100">{new Date(order.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></span>
+              <span>Date: <span className="font-semibold text-gray-900 dark:text-gray-100">{formatDate(order.date, 'long')}</span></span>
               <span className="hidden sm:inline">•</span>
-              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                order.status === 'shipped' || order.status === 'out-for-delivery' ? 'bg-blue-100 text-blue-800' :
-                order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-gray-100 text-gray-800'
-              }`}>
+              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeClass(order.status)}`}>
                 {order.status.replace('-', ' ')}
               </span>
             </div>
@@ -177,7 +176,7 @@ export default function OrderDetailPage() {
             </div>
             <div className="flex justify-between text-sm font-semibold">
               <span className="text-gray-900 dark:text-gray-100">Estimated total</span>
-              <span className="text-gray-900 dark:text-gray-100">${estimatedTotal.toFixed(2)}</span>
+              <span className="text-gray-900 dark:text-gray-100">{formatCurrency(estimatedTotal)}</span>
             </div>
             <Button 
               onClick={handleReorder}
