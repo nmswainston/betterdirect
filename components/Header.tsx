@@ -2,17 +2,26 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
+import Button from './ui/Button';
+import { useAuth } from './AuthProvider';
 
 export default function Header() {
   const pathname = usePathname();
-  
+  const router = useRouter();
+  const { user, logout } = useAuth();
+
   // Don't show header on login page
   if (pathname === '/login') {
     return null;
   }
-  
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 dark:bg-slate-900 dark:border-slate-800 dark:shadow-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,11 +48,16 @@ export default function Header() {
               Dashboard
             </Link>
             <div className="flex items-center space-x-2">
-              <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-200">
-                <span className="font-medium">John Doe</span>
-                <span className="text-gray-500 ml-1 sm:ml-2 hidden sm:inline dark:text-gray-400">IT Manager</span>
-              </div>
+              {user && (
+                <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 text-right">
+                  <span className="font-medium block">{user.name ?? user.email}</span>
+                  <span className="text-gray-500 sm:ml-2 hidden sm:inline dark:text-gray-400">{user.role ?? 'Member'}</span>
+                </div>
+              )}
               <ThemeToggle />
+              <Button size="sm" variant="outline" onClick={handleLogout}>
+                Logout
+              </Button>
             </div>
           </nav>
         </div>

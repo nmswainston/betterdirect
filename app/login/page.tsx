@@ -1,18 +1,26 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import ThemeToggle from '@/components/ThemeToggle';
+import { useAuth } from '@/components/AuthProvider';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthLoading && isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, isAuthLoading, router]);
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -33,7 +41,7 @@ export default function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -41,12 +49,11 @@ export default function LoginPage() {
     }
     
     setIsLoading(true);
-    
+
     // Mock authentication - simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      // Store mock auth state (in real app, use proper auth)
-      localStorage.setItem('isAuthenticated', 'true');
+      login({ email, name: 'John Doe', role: 'IT Manager' });
       router.push('/dashboard');
     }, 500);
   };
