@@ -21,7 +21,7 @@ export default function RootLayout({
           <div className="min-h-screen">
             {/* Header hides itself on /login so this is safe */}
             <Header />
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
               {children}
             </main>
           </div>

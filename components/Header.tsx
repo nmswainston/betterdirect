@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
+import { cn } from '@/lib/utils';
 
 export default function Header() {
   const pathname = usePathname();
@@ -12,12 +13,21 @@ export default function Header() {
   if (pathname === '/login') {
     return null;
   }
+
+  const navLinks = [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/orders', label: 'Orders' },
+  ];
   
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 dark:bg-slate-900 dark:border-slate-800 dark:shadow-slate-900/50">
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/80 dark:bg-slate-900/80 dark:border-slate-800/80 dark:shadow-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/dashboard" className="flex items-center" aria-label="Better Direct home">
+          <Link 
+            href="/dashboard" 
+            className="flex items-center group transition-transform duration-200 hover:scale-105" 
+            aria-label="Better Direct home"
+          >
             <Image
               src="/logo.svg"
               alt="Better Direct"
@@ -25,23 +35,44 @@ export default function Header() {
               height={40}
               style={{ width: '160px', height: '40px' }}
               priority
+              className="transition-opacity duration-200 group-hover:opacity-90"
             />
           </Link>
-          <nav className="flex items-center space-x-2 sm:space-x-4">
-            <Link
-              href="/dashboard"
-              className={`px-2 sm:px-3 py-2 rounded-md text-sm font-medium ${
-                pathname === '/dashboard'
-                  ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-100'
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-800'
-              }`}
-            >
-              Dashboard
-            </Link>
-            <div className="flex items-center space-x-2">
-              <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-200">
-                <span className="font-medium">John Doe</span>
-                <span className="text-gray-500 ml-1 sm:ml-2 hidden sm:inline dark:text-gray-400">IT Manager</span>
+          <nav className="flex items-center space-x-1 sm:space-x-2">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || (link.href === '/dashboard' && pathname === '/');
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    'px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                    'relative',
+                    isActive
+                      ? cn(
+                          'text-primary-700 bg-primary-50 dark:bg-primary-900/30 dark:text-primary-300',
+                          'shadow-sm'
+                        )
+                      : cn(
+                          'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
+                          'dark:text-gray-300 dark:hover:bg-slate-800 dark:hover:text-gray-100'
+                        )
+                  )}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-600 dark:bg-primary-400 rounded-t-full"
+                      aria-hidden="true"
+                    />
+                  )}
+                </Link>
+              );
+            })}
+            <div className="flex items-center space-x-3 ml-2 sm:ml-4 pl-2 sm:pl-4 border-l border-gray-200 dark:border-slate-700">
+              <div className="hidden sm:block text-sm text-gray-700 dark:text-gray-200">
+                <span className="font-semibold">John Doe</span>
+                <span className="text-gray-500 ml-2 dark:text-gray-400">IT Manager</span>
               </div>
               <ThemeToggle />
             </div>

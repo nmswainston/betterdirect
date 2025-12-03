@@ -1,56 +1,6 @@
 import { Order } from "@/types/order";
-import { Product } from "@/types/product";
 import { TrackingInfo } from "@/types/tracking";
 import { BotResponse } from "@/types/chat";
-
-// Mock Products
-export const mockProducts: Product[] = [
-  {
-    id: "prod-1",
-    name: "Dell OptiPlex 7090 Desktop",
-    sku: "DELL-7090-001",
-    price: 899.99,
-    description: "Intel Core i7, 16GB RAM, 512GB SSD",
-    category: "Desktops",
-    inStock: true,
-  },
-  {
-    id: "prod-2",
-    name: "HP EliteBook 850 G8",
-    sku: "HP-850G8-001",
-    price: 1299.99,
-    description: "15.6\" FHD, Intel i7, 16GB RAM, 512GB SSD",
-    category: "Laptops",
-    inStock: true,
-  },
-  {
-    id: "prod-3",
-    name: "DDR4 RAM 16GB",
-    sku: "RAM-DDR4-16GB",
-    price: 89.99,
-    description: "16GB DDR4 3200MHz SODIMM",
-    category: "Memory",
-    inStock: true,
-  },
-  {
-    id: "prod-4",
-    name: "Samsung 27\" Monitor",
-    sku: "SAM-27-4K",
-    price: 349.99,
-    description: "27\" 4K UHD IPS Monitor",
-    category: "Monitors",
-    inStock: true,
-  },
-  {
-    id: "prod-5",
-    name: "Logitech MX Master 3",
-    sku: "LOG-MX3-001",
-    price: 99.99,
-    description: "Wireless Mouse",
-    category: "Accessories",
-    inStock: true,
-  },
-];
 
 // Mock Orders
 export const mockOrders: Order[] = [

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ChatMessage } from '@/types/chat';
-import { getBotResponse, mockBotResponses } from '@/lib/mockData';
+import { getBotResponse } from '@/lib/mockData';
 import ChatMessageComponent from './ChatMessage';
 import Button from './ui/Button';
 

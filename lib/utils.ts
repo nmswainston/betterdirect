@@ -1,5 +1,10 @@
 import { Order } from '@/types/order';
 
+// Utility function for conditional class names
+export function cn(...classes: (string | boolean | undefined | null)[]): string {
+  return classes.filter(Boolean).join(' ');
+}
+
 // Status badge utilities
 export const statusClasses: Record<Order['status'], string> = {
   'ordered': 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',

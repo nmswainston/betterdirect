@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 import StatusBadge from '@/components/StatusBadge';
@@ -19,7 +20,6 @@ interface SelectedItem {
 }
 
 export default function OrderDetailPage() {
-  const router = useRouter();
   const params = useParams();
   const orderId = params.id as string;
   const { isReady, isLoading } = useAuthGuard();
@@ -118,16 +118,20 @@ export default function OrderDetailPage() {
     return selectedItems[itemId]?.quantity > 0;
   };
 
+  const [error, setError] = useState<string | null>(null);
+
   const handleReorder = () => {
     const itemsToReorder = Object.values(selectedItems).filter(
       (selected) => selected.quantity > 0
     );
 
     if (itemsToReorder.length === 0) {
-      alert('Please select at least one item to reorder.');
+      setError('Please select at least one item to reorder.');
+      setTimeout(() => setError(null), 5000);
       return;
     }
 
+    setError(null);
     // Mock reorder - in real app, this would make an API call
     setSuccess(true);
     setTimeout(() => setSuccess(false), 4000);
@@ -143,13 +147,29 @@ export default function OrderDetailPage() {
 
   return (
     <>
+      {error && (
+        <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-xl p-4 dark:bg-red-900/20 dark:border-red-800 animate-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0">
+              <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <p className="text-red-800 font-semibold dark:text-red-300">
+              {error}
+            </p>
+          </div>
+        </div>
+      )}
       {success && (
-        <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 dark:bg-green-900/20 dark:border-green-800">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 text-green-600 mr-2 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <p className="text-green-800 font-medium dark:text-green-300">
+        <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-xl p-4 dark:bg-green-900/20 dark:border-green-800 animate-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0">
+              <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <p className="text-green-800 font-semibold dark:text-green-300">
               Reorder successful! Your items have been added to cart.
             </p>
           </div>
@@ -177,8 +197,8 @@ export default function OrderDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
-            <div className="bg-white rounded-lg shadow-md p-6 dark:bg-slate-900 dark:shadow-slate-950/40">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-100">Items</h3>
+            <Card>
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 dark:text-gray-100">Order Items</h3>
               <div className="space-y-4">
                 {order.items.map((item) => (
                   <OrderItem
@@ -191,30 +211,33 @@ export default function OrderDetailPage() {
                   />
                 ))}
               </div>
-            </div>
+            </Card>
           </div>
 
-          <aside className="bg-white rounded-lg shadow-md p-6 space-y-4 dark:bg-slate-900 dark:shadow-slate-950/40">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Order Summary</h3>
+          <aside>
+            <Card className="sticky top-24">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Order Summary</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               PO: {order.poNumber}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Shipping to: {order.shippingAddress}
             </p>
-            <hr className="my-3 border-gray-200 dark:border-slate-700" />
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Items selected</span>
-              <span className="text-gray-900 dark:text-gray-100">{selectedCount}</span>
-            </div>
-            <div className="flex justify-between text-sm font-semibold">
-              <span className="text-gray-900 dark:text-gray-100">Estimated total</span>
-              <span className="text-gray-900 dark:text-gray-100">{formatCurrency(estimatedTotal)}</span>
+            <hr className="my-4 border-gray-200 dark:border-slate-700" />
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">Items selected</span>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">{selectedCount}</span>
+              </div>
+              <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-200 dark:border-slate-700">
+                <span className="text-gray-900 dark:text-gray-100">Estimated total</span>
+                <span className="text-gray-900 dark:text-gray-100">{formatCurrency(estimatedTotal)}</span>
+              </div>
             </div>
             <Button 
               onClick={handleReorder}
               disabled={selectedCount === 0}
-              className="w-full mt-4"
+              className="w-full mt-6"
             >
               Reorder Selected Items
             </Button>

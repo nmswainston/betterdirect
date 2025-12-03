@@ -20,11 +20,17 @@ export default function LoadingSpinner({
   return (
     <div className={`flex items-center justify-center min-h-[400px] ${className}`}>
       <div className="text-center">
-        <div
-          className={`inline-block animate-spin rounded-full border-b-2 border-primary-600 dark:border-primary-400 ${sizeClasses[size]}`}
-        />
+        <div className="relative inline-block">
+          <div
+            className={`inline-block animate-spin rounded-full border-2 border-primary-200 dark:border-primary-900/50 ${sizeClasses[size]}`}
+          />
+          <div
+            className={`absolute top-0 left-0 animate-spin rounded-full border-t-2 border-r-2 border-primary-600 dark:border-primary-400 ${sizeClasses[size]}`}
+            style={{ animationDuration: '0.75s' }}
+          />
+        </div>
         {message && (
-          <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">{message}</p>
+          <p className="mt-4 text-sm font-medium text-gray-600 dark:text-gray-400">{message}</p>
         )}
       </div>
     </div>

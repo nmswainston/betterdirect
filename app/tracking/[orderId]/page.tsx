@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Timeline from '@/components/Timeline';
 import Button from '@/components/ui/Button';
@@ -14,7 +14,6 @@ import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { formatDate, formatDateTime, formatCurrency } from '@/lib/utils';
 
 export default function TrackingPage() {
-  const router = useRouter();
   const params = useParams();
   const orderId = params.orderId as string;
   const { isReady, isLoading } = useAuthGuard();
